@@ -2,6 +2,8 @@
 
 import { SearchButton } from "@/components/search-button";
 import { useState } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css"; // スタイルをインポート
 
 // 東京の主要エリアリスト
 const tokyoAreas = [
@@ -29,13 +31,13 @@ const tokyoAreas = [
 
 export function SearchSection() {
   const [area, setArea] = useState("");
-  const [date, setDate] = useState("");
+  const [date, setDate] = useState<Date | null>(null); // Date型またはnull
   const [participants, setParticipants] = useState("");
 
   const handleSearch = () => {
     const queryParams = new URLSearchParams({
       area,
-      date,
+      date: date ? date.toISOString().split("T")[0] : "", // Dateを文字列に変換
       participants,
     }).toString();
 
@@ -68,11 +70,12 @@ export function SearchSection() {
               </div>
               <div className="p-4 text-left hover:bg-gray-50">
                 <div className="text-sm font-semibold text-gray-800">開催日</div>
-                <input
-                  type="date"
+                <DatePicker
+                  selected={date}
+                  onChange={(date: Date | null) => setDate(date)} // Date | null を受け取る
                   className="text-gray-500 bg-transparent border-none focus:outline-none w-full"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
+                  dateFormat="yyyy/MM/dd"
+                  placeholderText="開催日を選択"
                 />
               </div>
               <div className="flex items-center">
@@ -110,11 +113,14 @@ export function SearchSection() {
             </div>
             <div className="bg-white rounded-full shadow-lg border p-4 text-left hover:bg-gray-50">
               <div className="text-sm font-semibold text-gray-800">開催日</div>
-              <input
-                type="date"
+              <DatePicker
+                selected={date}
+                onChange={(date: Date | null) => setDate(date)} // Date | null を受け取る
                 className="text-gray-500 bg-transparent border-none focus:outline-none w-full"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
+                dateFormat="yyyy/MM/dd"
+                placeholderText="開催日を選択"
+                showPopperArrow={false} // モバイルでポップアップ矢印を非表示
+                withPortal // モバイルでフルスクリーンのカレンダーを表示
               />
             </div>
             <div className="bg-white rounded-full shadow-lg border p-4 text-left hover:bg-gray-50">
