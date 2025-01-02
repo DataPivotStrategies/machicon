@@ -95,43 +95,48 @@ export function SearchSection() {
           </div>
 
           {/* モバイルでは独立した背景 */}
-          <div className="grid grid-cols-1 gap-4 md:hidden">
-            <div className="bg-white rounded-full shadow-lg border p-4 text-left hover:bg-gray-50">
-              <div className="text-sm font-semibold text-gray-800">エリア</div>
-              <select
-                className="text-gray-500 bg-transparent border-none focus:outline-none w-full"
-                value={area}
-                onChange={(e) => setArea(e.target.value)}
-              >
-                <option value="">エリアを選択</option>
-                {tokyoAreas.map((area) => (
-                  <option key={area} value={area}>
-                    {area}
-                  </option>
-                ))}
-              </select>
+          <div className="md:hidden">
+            <div className="grid grid-cols-1 gap-4">
+              <div className="bg-white rounded-full shadow-lg border p-4 text-left hover:bg-gray-50">
+                <div className="text-sm font-semibold text-gray-800">エリア</div>
+                <select
+                  className="text-gray-500 bg-transparent border-none focus:outline-none w-full"
+                  value={area}
+                  onChange={(e) => setArea(e.target.value)}
+                >
+                  <option value="">エリアを選択</option>
+                  {tokyoAreas.map((area) => (
+                    <option key={area} value={area}>
+                      {area}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="bg-white rounded-full shadow-lg border p-4 text-left hover:bg-gray-50">
+                <div className="text-sm font-semibold text-gray-800">開催日</div>
+                <DatePicker
+                  selected={date}
+                  onChange={(date: Date | null) => setDate(date)} // Date | null を受け取る
+                  className="text-gray-500 bg-transparent border-none focus:outline-none w-full"
+                  dateFormat="yyyy/MM/dd"
+                  placeholderText="開催日を選択"
+                  showPopperArrow={false} // モバイルでポップアップ矢印を非表示
+                  withPortal // モバイルでフルスクリーンのカレンダーを表示
+                />
+              </div>
+              <div className="bg-white rounded-full shadow-lg border p-4 text-left hover:bg-gray-50">
+                <div className="text-sm font-semibold text-gray-800">参加人数</div>
+                <input
+                  type="number"
+                  className="text-gray-500 bg-transparent border-none focus:outline-none w-full"
+                  placeholder="ゲストを追加"
+                  value={participants}
+                  onChange={(e) => setParticipants(e.target.value)}
+                />
+              </div>
             </div>
-            <div className="bg-white rounded-full shadow-lg border p-4 text-left hover:bg-gray-50">
-              <div className="text-sm font-semibold text-gray-800">開催日</div>
-              <DatePicker
-                selected={date}
-                onChange={(date: Date | null) => setDate(date)} // Date | null を受け取る
-                className="text-gray-500 bg-transparent border-none focus:outline-none w-full"
-                dateFormat="yyyy/MM/dd"
-                placeholderText="開催日を選択"
-                showPopperArrow={false} // モバイルでポップアップ矢印を非表示
-                withPortal // モバイルでフルスクリーンのカレンダーを表示
-              />
-            </div>
-            <div className="bg-white rounded-full shadow-lg border p-4 text-left hover:bg-gray-50">
-              <div className="text-sm font-semibold text-gray-800">参加人数</div>
-              <input
-                type="number"
-                className="text-gray-500 bg-transparent border-none focus:outline-none w-full"
-                placeholder="ゲストを追加"
-                value={participants}
-                onChange={(e) => setParticipants(e.target.value)}
-              />
+            {/* サーチアイコンをgridの外に配置 */}
+            <div className="mt-4 flex justify-center">
               <SearchButton onClick={handleSearch} />
             </div>
           </div>
