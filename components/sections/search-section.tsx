@@ -3,7 +3,7 @@
 import { SearchButton } from "@/components/search-button";
 import { useState } from "react";
 import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css"; // スタイルをインポート
+import "react-datepicker/dist/react-datepicker.css";
 
 // 東京の主要エリアリスト
 const tokyoAreas = [
@@ -31,117 +31,223 @@ const tokyoAreas = [
 
 export function SearchSection() {
   const [area, setArea] = useState("");
-  const [date, setDate] = useState<Date | null>(null); // Date型またはnull
+  const [date, setDate] = useState<Date | null>(null);
   const [participants, setParticipants] = useState("");
+
+  // --- モバイル用モーダルの開閉管理 ---
+  const [isAreaModalOpen, setIsAreaModalOpen] = useState(false);
+  const [isDateModalOpen, setIsDateModalOpen] = useState(false);
+  const [isParticipantsModalOpen, setIsParticipantsModalOpen] = useState(false);
 
   const handleSearch = () => {
     const queryParams = new URLSearchParams({
       area,
-      date: date ? date.toISOString().split("T")[0] : "", // Dateを文字列に変換
+      date: date ? date.toISOString().split("T")[0] : "",
       participants,
     }).toString();
 
-    // ここでAPIを呼び出すか、検索処理を実行
     console.log("検索パラメータ:", { area, date, participants });
     // 例: fetch(`/api/search?${queryParams}`)
   };
+
+  // 選択された値の表示用
+  const areaLabel = area || "どこでも";
+  const dateLabel = date ? date.toLocaleDateString("ja-JP") : "週の指定なし";
+  const participantsLabel = participants ? `${participants}名` : "ゲストを追加";
 
   return (
     <div className="sticky top-16 z-30 bg-white border-b">
       <div className="container mx-auto px-4 py-4">
         <div className="max-w-5xl mx-auto">
-          {/* デスクトップでは1つの背景、モバイルでは独立した背景 */}
-          <div className="bg-white rounded-full shadow-lg border divide-x hidden md:block">
-            <div className="grid grid-cols-3">
-              <div className="p-4 text-left hover:bg-gray-50 rounded-l-full">
-                <div className="text-sm font-semibold text-gray-800">エリア</div>
-                <select
-                  className="text-gray-500 bg-transparent border-none focus:outline-none w-full"
-                  value={area}
-                  onChange={(e) => setArea(e.target.value)}
-                >
-                  <option value="">エリアを選択</option>
-                  {tokyoAreas.map((area) => (
-                    <option key={area} value={area}>
-                      {area}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="p-4 text-left hover:bg-gray-50">
-                <div className="text-sm font-semibold text-gray-800">開催日</div>
-                <DatePicker
-                  selected={date}
-                  onChange={(date: Date | null) => setDate(date)} // Date | null を受け取る
-                  className="text-gray-500 bg-transparent border-none focus:outline-none w-full"
-                  dateFormat="yyyy/MM/dd"
-                  placeholderText="開催日を選択"
-                />
-              </div>
-              <div className="flex items-center">
-                <div className="flex-1 p-4 text-left hover:bg-gray-50">
-                  <div className="text-sm font-semibold text-gray-800">参加人数</div>
-                  <input
-                    type="number"
+          {/* デスクトップ表示（md 以上） */}
+          <div className="hidden md:block">
+            <div className="bg-white rounded-full shadow-lg border divide-x">
+              <div className="grid grid-cols-3">
+                {/* --- エリア 選択 --- */}
+                <div className="p-4 text-left hover:bg-gray-50 rounded-l-full">
+                  <div className="text-sm font-semibold text-gray-800">エリア</div>
+                  <select
                     className="text-gray-500 bg-transparent border-none focus:outline-none w-full"
-                    placeholder="ゲストを追加"
-                    value={participants}
-                    onChange={(e) => setParticipants(e.target.value)}
+                    value={area}
+                    onChange={(e) => setArea(e.target.value)}
+                  >
+                    <option value="">エリアを選択</option>
+                    {tokyoAreas.map((area) => (
+                      <option key={area} value={area}>
+                        {area}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {/* --- 日付 選択 --- */}
+                <div className="p-4 text-left hover:bg-gray-50">
+                  <div className="text-sm font-semibold text-gray-800">開催日</div>
+                  <DatePicker
+                    selected={date}
+                    onChange={(date: Date | null) => setDate(date)}
+                    className="text-gray-500 bg-transparent border-none focus:outline-none w-full"
+                    dateFormat="yyyy/MM/dd"
+                    placeholderText="開催日を選択"
                   />
                 </div>
-                <SearchButton onClick={handleSearch} />
+                {/* --- 参加人数 + 検索 --- */}
+                <div className="flex items-center">
+                  <div className="flex-1 p-4 text-left hover:bg-gray-50">
+                    <div className="text-sm font-semibold text-gray-800">参加人数</div>
+                    <input
+                      type="number"
+                      className="text-gray-500 bg-transparent border-none focus:outline-none w-full"
+                      placeholder="ゲストを追加"
+                      value={participants}
+                      onChange={(e) => setParticipants(e.target.value)}
+                    />
+                  </div>
+                  <SearchButton onClick={handleSearch} />
+                </div>
               </div>
             </div>
           </div>
 
-          {/* モバイルでは独立した背景 */}
-          <div className="md:hidden">
-            <div className="grid grid-cols-1 gap-4">
-              <div className="bg-white rounded-full shadow-lg border p-4 text-left hover:bg-gray-50">
-                <div className="text-sm font-semibold text-gray-800">エリア</div>
-                <select
-                  className="text-gray-500 bg-transparent border-none focus:outline-none w-full"
-                  value={area}
-                  onChange={(e) => setArea(e.target.value)}
+          {/* モバイル表示（md 未満） */}
+          <div className="block md:hidden">
+            <div className="bg-white rounded-full shadow-lg border px-4 py-2 flex items-center justify-between">
+              <div className="text-sm font-semibold text-gray-800">行き先は？</div>
+              {/* 選択された値の表示部分 */}
+              <div className="ml-2 text-sm text-gray-500 flex gap-2">
+                {/* --- エリアラベルをタップしたらモーダルを開く --- */}
+                <span
+                  onClick={() => setIsAreaModalOpen(true)}
+                  className="cursor-pointer underline"
                 >
-                  <option value="">エリアを選択</option>
-                  {tokyoAreas.map((area) => (
-                    <option key={area} value={area}>
-                      {area}
-                    </option>
-                  ))}
-                </select>
+                  {areaLabel}
+                </span>
+                <span>・</span>
+                {/* --- 日付ラベルをタップしたらモーダルを開く --- */}
+                <span
+                  onClick={() => setIsDateModalOpen(true)}
+                  className="cursor-pointer underline"
+                >
+                  {dateLabel}
+                </span>
+                <span>・</span>
+                {/* --- 参加人数ラベルをタップしたらモーダルを開く --- */}
+                <span
+                  onClick={() => setIsParticipantsModalOpen(true)}
+                  className="cursor-pointer underline"
+                >
+                  {participantsLabel}
+                </span>
               </div>
-              <div className="bg-white rounded-full shadow-lg border p-4 text-left hover:bg-gray-50">
-                <div className="text-sm font-semibold text-gray-800">開催日</div>
-                <DatePicker
-                  selected={date}
-                  onChange={(date: Date | null) => setDate(date)} // Date | null を受け取る
-                  className="text-gray-500 bg-transparent border-none focus:outline-none w-full"
-                  dateFormat="yyyy/MM/dd"
-                  placeholderText="開催日を選択"
-                  showPopperArrow={false} // モバイルでポップアップ矢印を非表示
-                  withPortal // モバイルでフルスクリーンのカレンダーを表示
-                />
+
+              {/* 検索ボタン */}
+              <div className="ml-auto">
+                <SearchButton onClick={handleSearch} />
               </div>
-              <div className="bg-white rounded-full shadow-lg border p-4 text-left hover:bg-gray-50">
-                <div className="text-sm font-semibold text-gray-800">参加人数</div>
-                <input
-                  type="number"
-                  className="text-gray-500 bg-transparent border-none focus:outline-none w-full"
-                  placeholder="ゲストを追加"
-                  value={participants}
-                  onChange={(e) => setParticipants(e.target.value)}
-                />
-              </div>
-            </div>
-            {/* サーチアイコンをgridの外に配置 */}
-            <div className="mt-4 flex justify-center">
-              <SearchButton onClick={handleSearch} />
             </div>
           </div>
         </div>
       </div>
+
+      {/* =========================
+          以下、モバイル用モーダル群
+      ========================= */}
+
+      {/* エリア選択モーダル */}
+      {isAreaModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-sm rounded-lg p-4 relative">
+            <h2 className="text-lg font-bold mb-2">エリアを選択</h2>
+            <select
+              className="w-full border p-2 rounded"
+              value={area}
+              onChange={(e) => setArea(e.target.value)}
+            >
+              <option value="">どこでも</option>
+              {tokyoAreas.map((areaName) => (
+                <option key={areaName} value={areaName}>
+                  {areaName}
+                </option>
+              ))}
+            </select>
+            <div className="mt-4 flex justify-end">
+              <button
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 mr-2"
+                onClick={() => setIsAreaModalOpen(false)}
+              >
+                キャンセル
+              </button>
+              <button
+                className="px-4 py-2 bg-coral text-white rounded hover:bg-coral-600"
+                onClick={() => setIsAreaModalOpen(false)}
+              >
+                決定
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 日付選択モーダル */}
+      {isDateModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-sm rounded-lg p-4 relative">
+            <h2 className="text-lg font-bold mb-2">開催日を選択</h2>
+            <DatePicker
+              selected={date}
+              onChange={(dateValue: Date | null) => setDate(dateValue)}
+              className="border p-2 w-full rounded"
+              dateFormat="yyyy/MM/dd"
+              placeholderText="開催日を選択"
+              showPopperArrow={false}
+              withPortal
+            />
+            <div className="mt-4 flex justify-end">
+              <button
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 mr-2"
+                onClick={() => setIsDateModalOpen(false)}
+              >
+                キャンセル
+              </button>
+              <button
+                className="px-4 py-2 bg-coral text-white rounded hover:bg-coral-600"
+                onClick={() => setIsDateModalOpen(false)}
+              >
+                決定
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 参加人数選択モーダル */}
+      {isParticipantsModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-sm rounded-lg p-4 relative">
+            <h2 className="text-lg font-bold mb-2">参加人数</h2>
+            <input
+              type="number"
+              className="border p-2 w-full rounded"
+              placeholder="ゲストを追加"
+              value={participants}
+              onChange={(e) => setParticipants(e.target.value)}
+            />
+            <div className="mt-4 flex justify-end">
+              <button
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 mr-2"
+                onClick={() => setIsParticipantsModalOpen(false)}
+              >
+                キャンセル
+              </button>
+              <button
+                className="px-4 py-2 bg-coral text-white rounded hover:bg-coral-600"
+                onClick={() => setIsParticipantsModalOpen(false)}
+              >
+                決定
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
