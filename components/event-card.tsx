@@ -79,9 +79,9 @@ export function EventCard({ event }: EventCardProps) {
           </div>
         </div>
       </CardContent>
-      <CardFooter className="p-4 pt-0">
+      {/* <CardFooter className="p-4 pt-0">
         <Button className="w-full">詳細を見る</Button>
-      </CardFooter>
+      </CardFooter> */}
     </Card>
   )
 }
