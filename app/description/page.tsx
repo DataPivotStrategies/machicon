@@ -11,6 +11,7 @@ import { EventLocation } from "@/components/events/details/EventLocation";
 import { EventProhibited } from "@/components/events/details/EventProhibited";
 import { FloatingReservation } from "@/components/events/reservation/FloatingReservation";
 import { EventHost } from "@/components/events/details/EventHost";
+import { SearchHeader } from "@/components/layout/SearchHeader";
 
 export default function Home() {
   const [isLiked, setIsLiked] = useState(false);
@@ -69,8 +70,8 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
-      
+      {/* <Header /> */}
+      <SearchHeader/>
       <EventHero
         title={eventData.title}
         categories={eventData.categories}
