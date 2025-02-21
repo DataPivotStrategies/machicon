@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Users, Calendar, Phone, Mail, Globe, ExternalLink, Upload, PlusCircle, X, Save, Plus, Trash2, Copy, Edit } from "lucide-react";
+import { Search, Users, Calendar, Phone, Mail, Globe, ExternalLink, Upload, PlusCircle, X, Save, Plus, Trash2, Copy, Edit, MapPin, Clock } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   Card,
@@ -42,6 +42,7 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 
 const EVENT_TYPES = [
   "街コン",
@@ -284,7 +285,8 @@ export default function EventsAdmin() {
           <DialogTrigger asChild>
             <Button className="bg-primary hover:bg-primary/90">
               <PlusCircle className="mr-2 h-4 w-4" />
-              新規イベント作成
+              <span className="hidden sm:inline">新規イベント作成</span>
+              <span className="sm:hidden">新規作成</span>
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
@@ -377,90 +379,11 @@ export default function EventsAdmin() {
                         onChange={(e) => setNewEvent({ ...newEvent, locationDetails: e.target.value })}
                       />
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="receptionLocation">受付場所</Label>
-                      <Input
-                        id="receptionLocation"
-                        value={newEvent.receptionLocation}
-                        onChange={(e) => setNewEvent({ ...newEvent, receptionLocation: e.target.value })}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="receptionTime">受付時間</Label>
-                      <Input
-                        id="receptionTime"
-                        type="time"
-                        value={newEvent.receptionTime}
-                        onChange={(e) => setNewEvent({ ...newEvent, receptionTime: e.target.value })}
-                      />
-                    </div>
                   </div>
                 </TabsContent>
 
                 <TabsContent value="details" className="space-y-6">
                   <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label>イベント内容</Label>
-                      <div className="space-y-4">
-                        <div className="flex gap-4">
-                          <div className="flex-1">
-                            <Input
-                              placeholder="イベントの説明を入力"
-                              value={newEvent.description}
-                              onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
-                            />
-                          </div>
-                          <div className="w-[200px]">
-                            <Input
-                              type="file"
-                              accept="image/*"
-                              onChange={handleImageChange}
-                              className="hidden"
-                              id="image-upload"
-                            />
-                            <Button
-                              type="button"
-                              variant="outline"
-                              onClick={() => document.getElementById("image-upload")?.click()}
-                              className="w-full"
-                            >
-                              <Upload className="h-4 w-4 mr-2" />
-                              画像を選択
-                            </Button>
-                          </div>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => {
-                              console.log("Add new content section");
-                            }}
-                          >
-                            <Plus className="h-4 w-4" />
-                          </Button>
-                        </div>
-                        {previewUrl && (
-                          <div className="relative w-full h-40 bg-gray-100 rounded-lg overflow-hidden">
-                            <img
-                              src={previewUrl}
-                              alt="Preview"
-                              className="w-full h-full object-cover"
-                            />
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              className="absolute top-2 right-2"
-                              onClick={() => {
-                                setBannerImage(null);
-                                setPreviewUrl("");
-                              }}
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="menPrice">男性料金</Label>
@@ -503,46 +426,6 @@ export default function EventsAdmin() {
                         />
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label>参加条件（男性）</Label>
-                        <div className="flex gap-2 mt-2">
-                          <Input
-                            type="number"
-                            value={newEvent.menMinAge}
-                            onChange={(e) => setNewEvent({ ...newEvent, menMinAge: e.target.value })}
-                            placeholder="最小年齢"
-                          />
-                          <span className="flex items-center">～</span>
-                          <Input
-                            type="number"
-                            value={newEvent.menMaxAge}
-                            onChange={(e) => setNewEvent({ ...newEvent, menMaxAge: e.target.value })}
-                            placeholder="最大年齢"
-                          />
-                          <span className="flex items-center">歳</span>
-                        </div>
-                      </div>
-                      <div>
-                        <Label>参加条件（女性）</Label>
-                        <div className="flex gap-2 mt-2">
-                          <Input
-                            type="number"
-                            value={newEvent.womenMinAge}
-                            onChange={(e) => setNewEvent({ ...newEvent, womenMinAge: e.target.value })}
-                            placeholder="最小年齢"
-                          />
-                          <span className="flex items-center">～</span>
-                          <Input
-                            type="number"
-                            value={newEvent.womenMaxAge}
-                            onChange={(e) => setNewEvent({ ...newEvent, womenMaxAge: e.target.value })}
-                            placeholder="最大年齢"
-                          />
-                          <span className="flex items-center">歳</span>
-                        </div>
-                      </div>
-                    </div>
                   </div>
                 </TabsContent>
 
@@ -571,16 +454,6 @@ export default function EventsAdmin() {
                         value={newEvent.requirements}
                         onChange={(e) => setNewEvent({ ...newEvent, requirements: e.target.value })}
                         placeholder="参加に必要な条件を入力してください"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="organizerMessage">主催者からのメッセージ</Label>
-                      <textarea
-                        id="organizerMessage"
-                        className="w-full min-h-[100px] p-2 border rounded-md"
-                        value={newEvent.organizerMessage}
-                        onChange={(e) => setNewEvent({ ...newEvent, organizerMessage: e.target.value })}
-                        placeholder="参加者へのメッセージを入力してください"
                       />
                     </div>
                   </div>
@@ -677,57 +550,136 @@ export default function EventsAdmin() {
           </div>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>イベント名</TableHead>
-                <TableHead>開催日</TableHead>
-                <TableHead>場所</TableHead>
-                <TableHead>男性申込</TableHead>
-                <TableHead>女性申込</TableHead>
-                <TableHead>ステータス</TableHead>
-                <TableHead>アクション</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredEvents.map((event) => (
-                <TableRow key={event.id}>
-                  <TableCell className="font-medium">{event.title}</TableCell>
-                  <TableCell>{event.date}</TableCell>
-                  <TableCell>{event.location}</TableCell>
-                  <TableCell>
-                    <span>{event.menRegistered}/</span>
-                    <Input
-                      type="number"
-                      value={tempCapacities[event.id]?.men ?? event.menCapacity}
-                      onChange={(e) => updateCapacity(event.id, 'menCapacity', e.target.value)}
-                      className="w-16 h-8 inline-block mx-1"
-                      min={event.menRegistered}
-                    />
-                    <span>人</span>
-                  </TableCell>
-                  <TableCell>
-                    <span>{event.womenRegistered}/</span>
-                    <Input
-                      type="number"
-                      value={tempCapacities[event.id]?.women ?? event.womenCapacity}
-                      onChange={(e) => updateCapacity(event.id, 'womenCapacity', e.target.value)}
-                      className="w-16 h-8 inline-block mx-1"
-                      min={event.womenRegistered}
-                    />
-                    <span>人</span>
-                  </TableCell>
-                  <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      event.status === "締切間近" 
-                        ? "bg-red-100 text-red-800"
-                        : "bg-green-100 text-green-800"
-                    }`}>
+          {/* PC表示用のテーブル */}
+          <div className="hidden md:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>イベント名</TableHead>
+                  <TableHead>開催日</TableHead>
+                  <TableHead>場所</TableHead>
+                  <TableHead>男性申込</TableHead>
+                  <TableHead>女性申込</TableHead>
+                  <TableHead>ステータス</TableHead>
+                  <TableHead>アクション</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredEvents.map((event) => (
+                  <TableRow key={event.id}>
+                    <TableCell className="font-medium">{event.title}</TableCell>
+                    <TableCell>{event.date}</TableCell>
+                    <TableCell>{event.location}</TableCell>
+                    <TableCell>
+                      <span>{event.menRegistered}/</span>
+                      <Input
+                        type="number"
+                        value={tempCapacities[event.id]?.men ?? event.menCapacity}
+                        onChange={(e) => updateCapacity(event.id, 'menCapacity', e.target.value)}
+                        className="w-16 h-8 inline-block mx-1"
+                        min={event.menRegistered}
+                      />
+                      <span>人</span>
+                    </TableCell>
+                    <TableCell>
+                      <span>{event.womenRegistered}/</span>
+                      <Input
+                        type="number"
+                        value={tempCapacities[event.id]?.women ?? event.womenCapacity}
+                        onChange={(e) => updateCapacity(event.id, 'womenCapacity', e.target.value)}
+                        className="w-16 h-8 inline-block mx-1"
+                        min={event.womenRegistered}
+                      />
+                      <span>人</span>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={event.status === "締切間近" ? "destructive" : "default"}>
+                        {event.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => startEditing(event)}
+                          className="flex items-center gap-1"
+                        >
+                          <Edit className="h-4 w-4" />
+                          編集
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => duplicateEvent(event)}
+                          className="flex items-center gap-1"
+                        >
+                          <Copy className="h-4 w-4" />
+                          複製
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* SP表示用のカードリスト */}
+          <div className="md:hidden space-y-4">
+            {filteredEvents.map((event) => (
+              <Card key={event.id} className="overflow-hidden">
+                <CardHeader className="pb-3">
+                  <div className="flex justify-between items-start">
+                    <div className="space-y-1">
+                      <CardTitle className="text-base">{event.title}</CardTitle>
+                      <div className="flex items-center text-sm text-gray-500 space-x-2">
+                        <Calendar className="h-4 w-4" />
+                        <span>{event.date}</span>
+                      </div>
+                      <div className="flex items-center text-sm text-gray-500 space-x-2">
+                        <MapPin className="h-4 w-4" />
+                        <span>{event.location}</span>
+                      </div>
+                    </div>
+                    <Badge variant={event.status === "締切間近" ? "destructive" : "default"}>
                       {event.status}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>男性申込</Label>
+                        <div className="flex items-center space-x-2">
+                          <span>{event.menRegistered}/</span>
+                          <Input
+                            type="number"
+                            value={tempCapacities[event.id]?.men ?? event.menCapacity}
+                            onChange={(e) => updateCapacity(event.id, 'menCapacity', e.target.value)}
+                            className="w-16 h-8"
+                            min={event.menRegistered}
+                          />
+                          <span>人</span>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label>女性申込</Label>
+                        <div className="flex items-center space-x-2">
+                          <span>{event.womenRegistered}/</span>
+                          <Input
+                            type="number"
+                            value={tempCapacities[event.id]?.women ?? event.womenCapacity}
+                            onChange={(e) => updateCapacity(event.id, 'womenCapacity', e.target.value)}
+                            className="w-16 h-8"
+                            min={event.womenRegistered}
+                          />
+                          <span>人</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex justify-end space-x-2">
                       <Button
                         variant="outline"
                         size="sm"
@@ -747,11 +699,11 @@ export default function EventsAdmin() {
                         複製
                       </Button>
                     </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </CardContent>
       </Card>
 
@@ -786,7 +738,6 @@ export default function EventsAdmin() {
                   />
                 </div>
               </div>
-             ```tsx
               <div className="space-y-2">
                 <Label htmlFor="edit-location">開催場所</Label>
                 <Input

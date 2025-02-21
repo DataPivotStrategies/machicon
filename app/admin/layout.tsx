@@ -2,22 +2,32 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { 
   Calendar, 
   Users, 
   Settings, 
   LogOut,
   Menu,
-  X
+  X,
+  ChevronRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const pathname = usePathname();
+
+  const navigation = [
+    { name: "イベント管理", href: "/admin/events", icon: Calendar },
+    { name: "申込者一覧", href: "/admin/applicants", icon: Users },
+    { name: "設定", href: "/admin/settings", icon: Settings },
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -29,7 +39,7 @@ export default function AdminLayout({
               variant="ghost"
               size="icon"
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="mr-4"
+              className="mr-4 md:hidden"
             >
               {isSidebarOpen ? (
                 <X className="h-6 w-6" />
@@ -40,7 +50,7 @@ export default function AdminLayout({
             <h1 className="text-xl font-bold">街コンポータル 管理画面</h1>
           </div>
           <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-600">管理者: Admin</span>
+            <span className="text-sm text-gray-600 hidden sm:inline">管理者: Admin</span>
             <Button variant="ghost" size="icon">
               <LogOut className="h-5 w-5" />
             </Button>
@@ -48,44 +58,56 @@ export default function AdminLayout({
         </div>
       </header>
 
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-white border-r transition-transform duration-200 ease-in-out ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={cn(
+          "fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-white border-r transition-transform duration-200 ease-in-out z-50",
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full",
+          "md:translate-x-0" // Always show on desktop
+        )}
       >
         <nav className="p-4">
-          <div className="space-y-2">
-            <Link
-              href="/admin/events"
-              className="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-            >
-              <Calendar className="h-5 w-5" />
-              <span>イベント管理</span>
-            </Link>
-            <Link
-              href="/admin/applicants"
-              className="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-            >
-              <Users className="h-5 w-5" />
-              <span>申込者一覧</span>
-            </Link>
-            <Link
-              href="/admin/settings"
-              className="flex items-center space-x-3 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-            >
-              <Settings className="h-5 w-5" />
-              <span>設定</span>
-            </Link>
+          <div className="space-y-1">
+            {navigation.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={cn(
+                    "flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium",
+                    pathname === item.href
+                      ? "bg-primary text-white"
+                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  )}
+                  onClick={() => setIsSidebarOpen(false)}
+                >
+                  <div className="flex items-center">
+                    <Icon className="h-5 w-5 mr-3" />
+                    <span>{item.name}</span>
+                  </div>
+                  <ChevronRight className="h-4 w-4" />
+                </Link>
+              );
+            })}
           </div>
         </nav>
       </aside>
 
       {/* Main Content */}
       <main
-        className={`pt-16 ${
-          isSidebarOpen ? "ml-64" : "ml-0"
-        } transition-margin duration-200 ease-in-out`}
+        className={cn(
+          "pt-16 transition-margin duration-200 ease-in-out",
+          "md:ml-64" // Always indent on desktop
+        )}
       >
         {children}
       </main>
