@@ -42,6 +42,7 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 
 const applicants = [
   {
@@ -358,10 +359,10 @@ export default function ApplicantsAdmin() {
         <CardHeader>
           <div className="flex justify-between items-center">
             <div>
-              <CardTitle>申込者一覧</CardTitle>
-              <CardDescription>
+              <CardTitle>申込一覧</CardTitle>
+              {/* <CardDescription>
                 全プラットフォームの申込者情報を一括管理
-              </CardDescription>
+              </CardDescription> */}
             </div>
             <div className="flex gap-2">
               <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
@@ -619,62 +620,230 @@ export default function ApplicantsAdmin() {
           </div>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>名前</TableHead>
-                <TableHead>性別</TableHead>
-                <TableHead>年齢</TableHead>
-                <TableHead>総申込数</TableHead>
-                <TableHead>登録日</TableHead>
-                <TableHead>ステータス</TableHead>
-                <TableHead>詳細</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredApplicants.map((applicant) => (
-                <TableRow key={applicant.id}>
-                  <TableCell className="font-medium">{applicant.name}</TableCell>
-                  <TableCell>{applicant.gender}</TableCell>
-                  <TableCell>{applicant.age}歳</TableCell>
-                  <TableCell>
-                    {applicant.appliedEvents.length + 
-                      applicant.externalBookings.reduce((sum, platform) => 
-                        sum + platform.events.length, 0
-                      )}件
-                  </TableCell>
-                  <TableCell>{applicant.registeredDate}</TableCell>
-                  <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      applicant.status === "アクティブ"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
-                    }`}>
+          {/* PC表示用のテーブル */}
+          <div className="hidden md:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>名前</TableHead>
+                  <TableHead>性別</TableHead>
+                  <TableHead>年齢</TableHead>
+                  <TableHead>総申込数</TableHead>
+                  <TableHead>登録日</TableHead>
+                  <TableHead>ステータス</TableHead>
+                  <TableHead>詳細</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredApplicants.map((applicant) => (
+                  <TableRow key={applicant.id}>
+                    <TableCell className="font-medium">{applicant.name}</TableCell>
+                    <TableCell>{applicant.gender}</TableCell>
+                    <TableCell>{applicant.age}歳</TableCell>
+                    <TableCell>
+                      {applicant.appliedEvents.length + 
+                        applicant.externalBookings.reduce((sum, platform) => 
+                          sum + platform.events.length, 0
+                        )}件
+                    </TableCell>
+                    <TableCell>{applicant.registeredDate}</TableCell>
+                    <TableCell>
+                      <Badge variant={applicant.status === "アクティブ" ? "default" : "destructive"}>
+                        {applicant.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setSelectedApplicant(applicant)}
+                          >
+                            詳細を見る
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-[800px]">
+                          <DialogHeader>
+                            <DialogTitle>申込者詳細情報</DialogTitle>
+                            <DialogDescription>
+                              申込者の詳細情報と全プラットフォームでの申込履歴
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="space-y-6 py-4">
+                            <div className="space-y-4">
+                              <h3 className="font-semibold">基本情報</h3>
+                              <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                  <div className="flex items-center gap-2">
+                                    <Users className="h-4 w-4 text-gray-500" />
+                                    <span>{applicant.name}</span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <Mail className="h-4 w-4 text-gray-500" />
+                                    <span>{applicant.email}</span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <Phone className="h-4 w-4 text-gray-500" />
+                                    <span>{applicant.phone}</span>
+                                  </div>
+                                </div>
+                                <div className="space-y-2">
+                                  <div>性別: {applicant.gender}</div>
+                                  <div>年齢: {applicant.age}歳</div>
+                                  <div>登録日: {applicant.registeredDate}</div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="space-y-4">
+                              <h3 className="font-semibold">申込履歴</h3>
+                              <Tabs defaultValue="own" className="w-full">
+                                <TabsList>
+                                  <TabsTrigger value="own">自社サイト</TabsTrigger>
+                                  {applicant.externalBookings.map((platform) => (
+                                    <TabsTrigger key={platform.platform} value={platform.platform}>
+                                      {platform.platform}
+                                    </TabsTrigger>
+                                  ))}
+                                </TabsList>
+                                <TabsContent value="own">
+                                  <div className="space-y-3">
+                                    {applicant.appliedEvents.map((event, index) => (
+                                      <div
+                                        key={index}
+                                        className="border rounded-lg p-3 space-y-2"
+                                      >
+                                        <div className="font-medium">{event.title}</div>
+                                        <div className="text-sm text-gray-500">
+                                          開催日: {event.date}
+                                        </div>
+                                        <div>
+                                          <Badge variant={
+                                            event.status === "参加確定" ? "default" :
+                                            event.status === "キャンセル" ? "destructive" :
+                                            "secondary"
+                                          }>
+                                            {event.status}
+                                          </Badge>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </TabsContent>
+                                {applicant.externalBookings.map((platform) => (
+                                  <TabsContent key={platform.platform} value={platform.platform}>
+                                    <div className="space-y-3">
+                                      {platform.events.map((event, index) => (
+                                        <div
+                                          key={index}
+                                          className="border rounded-lg p-3 space-y-2"
+                                        >
+                                          <div className="flex items-center justify-between">
+                                            <div className="font-medium">{event.title}</div>
+                                            <div className="text-sm text-gray-500">
+                                              料金: ¥{event.price.toLocaleString()}
+                                            </div>
+                                          </div>
+                                          <div className="text-sm text-gray-500">
+                                            開催日: {event.date}
+                                          </div>
+                                          <div className="flex items-center justify-between">
+                                            <Badge variant={
+                                              event.status === "参加確定" ? "default" :
+                                              event.status === "キャンセル" ? "destructive" :
+                                              "secondary"
+                                            }>
+                                              {event.status}
+                                            </Badge>
+                                            <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                                              <ExternalLink className="h-4 w-4" />
+                                              予約詳細を見る
+                                            </Button>
+                                          </div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </TabsContent>
+                                ))}
+                              </Tabs>
+                            </div>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* SP表示 {/* SP表示用のカードリスト */}
+          <div className="md:hidden space-y-4">
+            {filteredApplicants.map((applicant) => (
+              <Card key={applicant.id} className="overflow-hidden">
+                <CardHeader className="pb-3">
+                  <div className="flex justify-between items-start">
+                    <div className="space-y-1">
+                      <CardTitle className="text-base">{applicant.name}</CardTitle>
+                      <div className="flex items-center text-sm text-gray-500 space-x-2">
+                        <Mail className="h-4 w-4" />
+                        <span>{applicant.email}</span>
+                      </div>
+                      <div className="flex items-center text-sm text-gray-500 space-x-2">
+                        <Phone className="h-4 w-4" />
+                        <span>{applicant.phone}</span>
+                      </div>
+                    </div>
+                    <Badge variant={applicant.status === "アクティブ" ? "default" : "destructive"}>
                       {applicant.status}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setSelectedApplicant(applicant)}
-                        >
-                          詳細を見る
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-[800px]">
-                        <DialogHeader>
-                          <DialogTitle>申込者詳細情報</DialogTitle>
-                          <DialogDescription>
-                            申込者の詳細情報と全プラットフォームでの申込履歴
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="space-y-6 py-4">
-                          <div className="space-y-4">
-                            <h3 className="font-semibold">基本情報</h3>
-                            <div className="grid grid-cols-2 gap-4">
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-3 gap-4 text-sm">
+                      <div>
+                        <Label>性別</Label>
+                        <div className="mt-1">{applicant.gender}</div>
+                      </div>
+                      <div>
+                        <Label>年齢</Label>
+                        <div className="mt-1">{applicant.age}歳</div>
+                      </div>
+                      <div>
+                        <Label>総申込数</Label>
+                        <div className="mt-1">
+                          {applicant.appliedEvents.length + 
+                            applicant.externalBookings.reduce((sum, platform) => 
+                              sum + platform.events.length, 0
+                            )}件
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex justify-end">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setSelectedApplicant(applicant)}
+                            className="flex items-center gap-2"
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                            詳細を見る
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-[800px]">
+                          <DialogHeader>
+                            <DialogTitle>申込者詳細情報</DialogTitle>
+                            <DialogDescription>
+                              申込者の詳細情報と全プラットフォームでの申込履歴
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="space-y-6 py-4">
+                            <div className="space-y-4">
+                              <h3 className="font-semibold">基本情報</h3>
                               <div className="space-y-2">
                                 <div className="flex items-center gap-2">
                                   <Users className="h-4 w-4 text-gray-500" />
@@ -688,99 +857,89 @@ export default function ApplicantsAdmin() {
                                   <Phone className="h-4 w-4 text-gray-500" />
                                   <span>{applicant.phone}</span>
                                 </div>
-                              </div>
-                              <div className="space-y-2">
-                                <div>性別: {applicant.gender}</div>
-                                <div>年齢: {applicant.age}歳</div>
-                                <div>登録日: {applicant.registeredDate}</div>
+                                <div className="grid grid-cols-3 gap-4 mt-4">
+                                  <div>性別: {applicant.gender}</div>
+                                  <div>年齢: {applicant.age}歳</div>
+                                  <div>登録日: {applicant.registeredDate}</div>
+                                </div>
                               </div>
                             </div>
-                          </div>
 
-                          <div className="space-y-4">
-                            <h3 className="font-semibold">申込履歴</h3>
-                            <Tabs defaultValue="own" className="w-full">
-                              <TabsList>
-                                <TabsTrigger value="own">自社サイト</TabsTrigger>
-                                {applicant.externalBookings.map((platform) => (
-                                  <TabsTrigger key={platform.platform} value={platform.platform}>
-                                    {platform.platform}
-                                  </TabsTrigger>
-                                ))}
-                              </TabsList>
-                              <TabsContent value="own">
-                                <div className="space-y-3">
-                                  {applicant.appliedEvents.map((event, index) => (
-                                    <div
-                                      key={index}
-                                      className="border rounded-lg p-3 space-y-2"
-                                    >
-                                      <div className="font-medium">{event.title}</div>
-                                      <div className="text-sm text-gray-500">
-                                        開催日: {event.date}
-                                      </div>
-                                      <div>
-                                        <span className={`px-2 py-1 rounded-full text-xs ${
-                                          event.status === "参加確定"
-                                            ? "bg-green-100 text-green-800"
-                                            : event.status === "キャンセル"
-                                            ? "bg-red-100 text-red-800"
-                                            : "bg-yellow-100 text-yellow-800"
-                                        }`}>
-                                          {event.status}
-                                        </span>
-                                      </div>
-                                    </div>
+                            <div className="space-y-4">
+                              <h3 className="font-semibold">申込履歴</h3>
+                              <Tabs defaultValue="own" className="w-full">
+                                <TabsList className="grid w-full grid-cols-3">
+                                  <TabsTrigger value="own">自社サイト</TabsTrigger>
+                                  {applicant.externalBookings.map((platform) => (
+                                    <TabsTrigger key={platform.platform} value={platform.platform}>
+                                      {platform.platform}
+                                    </TabsTrigger>
                                   ))}
-                                </div>
-                              </TabsContent>
-                              {applicant.externalBookings.map((platform) => (
-                                <TabsContent key={platform.platform} value={platform.platform}>
+                                </TabsList>
+                                <TabsContent value="own">
                                   <div className="space-y-3">
-                                    {platform.events.map((event, index) => (
+                                    {applicant.appliedEvents.map((event, index) => (
                                       <div
                                         key={index}
                                         className="border rounded-lg p-3 space-y-2"
                                       >
-                                        <div className="flex items-center justify-between">
-                                          <div className="font-medium">{event.title}</div>
-                                          <div className="text-sm text-gray-500">
-                                            料金: ¥{event.price.toLocaleString()}
-                                          </div>
-                                        </div>
+                                        <div className="font-medium">{event.title}</div>
                                         <div className="text-sm text-gray-500">
                                           開催日: {event.date}
                                         </div>
-                                        <div className="flex items-center justify-between">
-                                          <span className={`px-2 py-1 rounded-full text-xs ${
-                                            event.status === "参加確定"
-                                              ? "bg-green-100 text-green-800"
-                                              : event.status === "キャンセル"
-                                              ? "bg-red-100 text-red-800"
-                                              : "bg-yellow-100 text-yellow-800"
-                                          }`}>
+                                        <div>
+                                          <Badge variant={
+                                            event.status === "参加確定" ? "default" :
+                                            event.status === "キャンセル" ? "destructive" :
+                                            "secondary"
+                                          }>
                                             {event.status}
-                                          </span>
-                                          <Button variant="ghost" size="sm" className="flex items-center gap-1">
-                                            <ExternalLink className="h-4 w-4" />
-                                            予約詳細を見る
-                                          </Button>
+                                          </Badge>
                                         </div>
                                       </div>
                                     ))}
-                                   </div>
+                                  </div>
                                 </TabsContent>
-                              ))}
-                            </Tabs>
+                                {applicant.externalBookings.map((platform) => (
+                                  <TabsContent key={platform.platform} value={platform.platform}>
+                                    <div className="space-y-3">
+                                      {platform.events.map((event, index) => (
+                                        <div
+                                          key={index}
+                                          className="border rounded-lg p-3 space-y-2"
+                                        >
+                                          <div className="font-medium">{event.title}</div>
+                                          <div className="text-sm text-gray-500">
+                                            開催日: {event.date}
+                                          </div>
+                                          <div className="flex items-center justify-between">
+                                            <Badge variant={
+                                              event.status === "参加確定" ? "default" :
+                                              event.status === "キャンセル" ? "destructive" :
+                                              "secondary"
+                                            }>
+                                              {event.status}
+                                            </Badge>
+                                            <div className="text-sm text-gray-500">
+                                              料金: ¥{event.price.toLocaleString()}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </TabsContent>
+                                ))}
+                              </Tabs>
+                            </div>
                           </div>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </CardContent>
       </Card>
     </div>
