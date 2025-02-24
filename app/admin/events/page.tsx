@@ -296,171 +296,153 @@ export default function EventsAdmin() {
                 新しい街コンイベントの詳細を入力してください。
               </DialogDescription>
             </DialogHeader>
-            <form onSubmit={handleSubmit}>
-              <Tabs defaultValue="basic" className="pt-4">
-                <TabsList className="grid w-full grid-cols-4">
-                  <TabsTrigger value="basic">基本情報</TabsTrigger>
-                  <TabsTrigger value="details">詳細情報</TabsTrigger>
-                  <TabsTrigger value="schedule">スケジュール</TabsTrigger>
-                  <TabsTrigger value="other">その他</TabsTrigger>
-                </TabsList>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="title">イベント名</Label>
+                  <Input
+                    id="title"
+                    value={newEvent.title}
+                    onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="type">イベント種別</Label>
+                  <Select
+                    value={newEvent.type}
+                    onValueChange={(value) => setNewEvent({ ...newEvent, type: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="種別を選択" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {EVENT_TYPES.map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {type}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                <TabsContent value="basic" className="space-y-6">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="title">イベント名</Label>
-                      <Input
-                        id="title"
-                        value={newEvent.title}
-                        onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="type">イベント種別</Label>
-                      <Select
-                        value={newEvent.type}
-                        onValueChange={(value) => setNewEvent({ ...newEvent, type: value })}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="種別を選択" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {EVENT_TYPES.map((type) => (
-                            <SelectItem key={type} value={type}>
-                              {type}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="date">開催日</Label>
-                      <Input
-                        id="date"
-                        type="date"
-                        value={newEvent.date}
-                        onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>開催時間</Label>
-                      <div className="flex gap-2">
-                        <Input
-                          type="time"
-                          value={newEvent.startTime}
-                          onChange={(e) => setNewEvent({ ...newEvent, startTime: e.target.value })}
-                          required
-                        />
-                        <span className="flex items-center">～</span>
-                        <Input
-                          type="time"
-                          value={newEvent.endTime}
-                          onChange={(e) => setNewEvent({ ...newEvent, endTime: e.target.value })}
-                          required
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="location">開催場所</Label>
-                      <Input
-                        id="location"
-                        value={newEvent.location}
-                        onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="locationDetails">会場詳細</Label>
-                      <Input
-                        id="locationDetails"
-                        value={newEvent.locationDetails}
-                        onChange={(e) => setNewEvent({ ...newEvent, locationDetails: e.target.value })}
-                      />
-                    </div>
+                <div className="space-y-2">
+                  <Label htmlFor="date">開催日</Label>
+                  <Input
+                    id="date"
+                    type="date"
+                    value={newEvent.date}
+                    onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>開催時間</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="time"
+                      value={newEvent.startTime}
+                      onChange={(e) => setNewEvent({ ...newEvent, startTime: e.target.value })}
+                      required
+                    />
+                    <span className="flex items-center">～</span>
+                    <Input
+                      type="time"
+                      value={newEvent.endTime}
+                      onChange={(e) => setNewEvent({ ...newEvent, endTime: e.target.value })}
+                      required
+                    />
                   </div>
-                </TabsContent>
+                </div>
 
-                <TabsContent value="details" className="space-y-6">
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="menPrice">男性料金</Label>
-                        <Input
-                          id="menPrice"
-                          type="number"
-                          value={newEvent.menPrice}
-                          onChange={(e) => setNewEvent({ ...newEvent, menPrice: e.target.value })}
-                          placeholder="6000"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="womenPrice">女性料金</Label>
-                        <Input
-                          id="womenPrice"
-                          type="number"
-                          value={newEvent.womenPrice}
-                          onChange={(e) => setNewEvent({ ...newEvent, womenPrice: e.target.value })}
-                          placeholder="4000"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="menCapacity">男性定員</Label>
-                        <Input
-                          id="menCapacity"
-                          type="number"
-                          value={newEvent.menCapacity}
-                          onChange={(e) => setNewEvent({ ...newEvent, menCapacity: e.target.value })}
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="womenCapacity">女性定員</Label>
-                        <Input
-                          id="womenCapacity"
-                          type="number"
-                          value={newEvent.womenCapacity}
-                          onChange={(e) => setNewEvent({ ...newEvent, womenCapacity: e.target.value })}
-                          required
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
+                <div className="space-y-2">
+                  <Label htmlFor="location">開催場所</Label>
+                  <Input
+                    id="location"
+                    value={newEvent.location}
+                    onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
+                    required
+                  />
+                </div>
 
-                <TabsContent value="schedule" className="space-y-6">
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="schedule">タイムスケジュール</Label>
-                      <textarea
-                        id="schedule"
-                        className="w-full min-h-[100px] p-2 border rounded-md"
-                        value={newEvent.schedule}
-                        onChange={(e) => setNewEvent({ ...newEvent, schedule: e.target.value })}
-                        placeholder="例：&#13;&#10;19:00 受付開始&#13;&#10;19:30 イベント開始&#13;&#10;21:30 イベント終了"
-                      />
-                    </div>
-                  </div>
-                </TabsContent>
+                <div className="space-y-2">
+                  <Label htmlFor="locationDetails">会場詳細</Label>
+                  <Input
+                    id="locationDetails"
+                    value={newEvent.locationDetails}
+                    onChange={(e) => setNewEvent({ ...newEvent, locationDetails: e.target.value })}
+                  />
+                </div>
 
-                <TabsContent value="other" className="space-y-6">
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="requirements">参加条件</Label>
-                      <textarea
-                        id="requirements"
-                        className="w-full min-h-[100px] p-2 border rounded-md"
-                        value={newEvent.requirements}
-                        onChange={(e) => setNewEvent({ ...newEvent, requirements: e.target.value })}
-                        placeholder="参加に必要な条件を入力してください"
-                      />
-                    </div>
-                  </div>
-                </TabsContent>
-              </Tabs>
+                <div className="space-y-2">
+                  <Label htmlFor="menPrice">男性料金</Label>
+                  <Input
+                    id="menPrice"
+                    type="number"
+                    value={newEvent.menPrice}
+                    onChange={(e) => setNewEvent({ ...newEvent, menPrice: e.target.value })}
+                    placeholder="6000"
+                  />
+                </div>
 
-              <div className="flex justify-end space-x-4 mt-6">
+                <div className="space-y-2">
+                  <Label htmlFor="womenPrice">女性料金</Label>
+                  <Input
+                    id="womenPrice"
+                    type="number"
+                    value={newEvent.womenPrice}
+                    onChange={(e) => setNewEvent({ ...newEvent, womenPrice: e.target.value })}
+                    placeholder="4000"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="menCapacity">男性定員</Label>
+                  <Input
+                    id="menCapacity"
+                    type="number"
+                    value={newEvent.menCapacity}
+                    onChange={(e) => setNewEvent({ ...newEvent, menCapacity: e.target.value })}
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="womenCapacity">女性定員</Label>
+                  <Input
+                    id="womenCapacity"
+                    type="number"
+                    value={newEvent.womenCapacity}
+                    onChange={(e) => setNewEvent({ ...newEvent, womenCapacity: e.target.value })}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="schedule">タイムスケジュール</Label>
+                <textarea
+                  id="schedule"
+                  className="w-full min-h-[100px] p-2 border rounded-md"
+                  value={newEvent.schedule}
+                  onChange={(e) => setNewEvent({ ...newEvent, schedule: e.target.value })}
+                  placeholder="例：&#13;&#10;19:00 受付開始&#13;&#10;19:30 イベント開始&#13;&#10;21:30 イベント終了"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="requirements">参加条件</Label>
+                <textarea
+                  id="requirements"
+                  className="w-full min-h-[100px] p-2 border rounded-md"
+                  value={newEvent.requirements}
+                  onChange={(e) => setNewEvent({ ...newEvent, requirements: e.target.value })}
+                  placeholder="参加に必要な条件を入力してください"
+                />
+              </div>
+
+              <div className="flex justify-end space-x-4">
                 <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
                   キャンセル
                 </Button>
