@@ -47,7 +47,9 @@ export default function AdminLayout({
                 <Menu className="h-6 w-6" />
               )}
             </Button>
-            <h1 className="text-xl font-bold">街コンポータル 管理画面</h1>
+            <h1 className="text-xl font-bold">
+              <a href="/admin">街コンポータル 管理画面</a>
+            </h1>
           </div>
           <div className="flex items-center space-x-4">
             <span className="text-sm text-gray-600 hidden sm:inline">管理者: Admin</span>
