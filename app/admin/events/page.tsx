@@ -135,6 +135,7 @@ export default function EventsAdmin() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [locationFilter, setLocationFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("all");
+  const [titleError, setTitleError] = useState<string>("");
 
   const locations = Array.from(new Set(events.map(event => event.location)));
 
@@ -176,8 +177,21 @@ export default function EventsAdmin() {
     }
   };
 
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value.length > 100) {
+      setTitleError("イベント名は100文字以内で入力してください");
+    } else {
+      setTitleError("");
+    }
+    setNewEvent({ ...newEvent, title: value });
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (newEvent.title.length > 100) {
+      return;
+    }
     const newId = Math.max(...events.map(e => e.id)) + 1;
     const createdEvent = {
       id: newId,
@@ -298,14 +312,22 @@ export default function EventsAdmin() {
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
+                <div className="col-span-2 space-y-2">
                   <Label htmlFor="title">イベント名</Label>
                   <Input
                     id="title"
                     value={newEvent.title}
-                    onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
+                    onChange={handleTitleChange}
+                    className={titleError ? "border-red-500" : ""}
+                    placeholder="最大100文字まで"
                     required
                   />
+                  {titleError && (
+                    <p className="text-sm text-red-500 mt-1">{titleError}</p>
+                  )}
+                  <p className="text-sm text-gray-500 mt-1">
+                    {newEvent.title.length}/100文字
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="type">イベント種別</Label>
