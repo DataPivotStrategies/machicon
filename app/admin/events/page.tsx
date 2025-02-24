@@ -89,6 +89,45 @@ const initialEvents = [
   },
 ];
 
+type EventType = {
+  title: string;
+  type: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  location: string;
+  locationDetails: string;
+  receptionLocation: string;
+  receptionTime: string;
+  ticketCount: string;
+  salesDeadline: string;
+  menPrice: string;
+  womenPrice: string;
+  menCapacity: string;
+  womenCapacity: string;
+  menMinAge: string;
+  menMaxAge: string;
+  womenMinAge: string;
+  womenMaxAge: string;
+  description: string;
+  schedule: string;
+  requirements: string;
+  organizerMessage: string;
+  prohibitedMatters: string;
+  faq: string;
+  confirmationArea: string;
+  contactNumber: string;
+  scale: string;
+  description1: string;
+  description2: string;
+  description3: string;
+  description4: string;
+  imagePreview1: string | null;
+  imagePreview2: string | null;
+  imagePreview3: string | null;
+  imagePreview4: string | null;
+};
+
 const emptyEvent = {
   title: "",
   type: "",
@@ -118,6 +157,14 @@ const emptyEvent = {
   confirmationArea: "",
   contactNumber: "",
   scale: "",
+  description1: "",
+  description2: "",
+  description3: "",
+  description4: "",
+  imagePreview1: null,
+  imagePreview2: null,
+  imagePreview3: null,
+  imagePreview4: null,
 };
 
 export default function EventsAdmin() {
@@ -464,6 +511,79 @@ export default function EventsAdmin() {
                   onChange={(e) => setNewEvent({ ...newEvent, requirements: e.target.value })}
                   placeholder="参加に必要な条件を入力してください"
                 />
+              </div>
+
+              <div className="space-y-6 mt-6">
+                {[1, 2, 3, 4].map((index) => (
+                  <div key={index} className="space-y-4 p-4 border rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <h3 className="font-medium">説明文 {index}</h3>
+                      <div className="text-sm text-gray-500">
+                        画像サイズ: 推奨 1200x800px
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor={`description${index}`}>説明文</Label>
+                      <textarea
+                        id={`description${index}`}
+                        className="w-full min-h-[100px] p-2 border rounded-md"
+                        value={newEvent[`description${index}` as keyof typeof newEvent] || ''}
+                        onChange={(e) => setNewEvent({ 
+                          ...newEvent, 
+                          [`description${index}`]: e.target.value 
+                        })}
+                        placeholder="イベントの説明文を入力してください"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor={`image${index}`}>画像</Label>
+                      <div className="flex items-center gap-4">
+                        <Input
+                          id={`image${index}`}
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              // ここで画像のプレビューと保存のロジックを実装
+                              const url = URL.createObjectURL(file);
+                              setNewEvent({
+                                ...newEvent,
+                                [`imagePreview${index}`]: url
+                              });
+                            }
+                          }}
+                          className="flex-1"
+                        />
+                        {newEvent[`imagePreview${index}` as keyof typeof newEvent] && (
+                          <div className="relative w-20 h-20">
+                            <img
+                              src={newEvent[`imagePreview${index}` as keyof typeof newEvent] as string}
+                              alt={`プレビュー ${index}`}
+                              className="w-full h-full object-cover rounded"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setNewEvent({
+                                  ...newEvent,
+                                  [`imagePreview${index}`]: null
+                                });
+                                const input = document.getElementById(`image${index}`) as HTMLInputElement;
+                                if (input) input.value = '';
+                              }}
+                              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
 
               <div className="flex justify-end space-x-4">
