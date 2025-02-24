@@ -379,7 +379,7 @@ export default function EventsAdmin() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="location">開催場所</Label>
+                  <Label htmlFor="location">会場場所</Label>
                   <Input
                     id="location"
                     value={newEvent.location}
@@ -389,7 +389,7 @@ export default function EventsAdmin() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="locationDetails">会場詳細</Label>
+                  <Label htmlFor="locationDetails">受付住所</Label>
                   <Input
                     id="locationDetails"
                     value={newEvent.locationDetails}
