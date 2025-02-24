@@ -43,6 +43,7 @@ import {
 } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const EVENT_TYPES = [
   "街コン",
@@ -126,6 +127,9 @@ type EventType = {
   imagePreview2: string | null;
   imagePreview3: string | null;
   imagePreview4: string | null;
+  titlePrefix: string;
+  customPrefix: string;
+  remainingCount: string;
 };
 
 const emptyEvent = {
@@ -165,7 +169,21 @@ const emptyEvent = {
   imagePreview2: null,
   imagePreview3: null,
   imagePreview4: null,
+  titlePrefix: "",
+  customPrefix: "",
+  remainingCount: "",
 };
+
+const TITLE_PREFIXES = [
+  { id: "menRecruiting", label: "男性募集" },
+  { id: "womenRecruiting", label: "女性募集" },
+  { id: "menRecommended", label: "男性オススメ" },
+  { id: "womenRecommended", label: "女性オススメ" },
+  { id: "menRemaining", label: "男性あと○○名募集" },
+  { id: "womenRemaining", label: "女性あと○○名募集" },
+  { id: "currentParticipants", label: "現在○○名" },
+  { id: "custom", label: "自由記入" },
+] as const;
 
 export default function EventsAdmin() {
   const [events, setEvents] = useState(initialEvents);
@@ -239,10 +257,26 @@ export default function EventsAdmin() {
     if (newEvent.title.length > 100) {
       return;
     }
+    if (newEvent.titlePrefix === "custom" && newEvent.customPrefix.length < 10) {
+      return;
+    }
+
+    let prefix = newEvent.titlePrefix === "custom" 
+      ? newEvent.customPrefix 
+      : TITLE_PREFIXES.find(p => p.id === newEvent.titlePrefix)?.label || "";
+
+    if (newEvent.titlePrefix === "menRemaining") {
+      prefix = `男性あと${newEvent.remainingCount}名募集`;
+    } else if (newEvent.titlePrefix === "womenRemaining") {
+      prefix = `女性あと${newEvent.remainingCount}名募集`;
+    } else if (newEvent.titlePrefix === "currentParticipants") {
+      prefix = `現在${newEvent.remainingCount}名`;
+    }
+    
     const newId = Math.max(...events.map(e => e.id)) + 1;
     const createdEvent = {
       id: newId,
-      title: newEvent.title,
+      title: prefix ? `【${prefix}】${newEvent.title}` : newEvent.title,
       date: newEvent.date,
       location: newEvent.location,
       menCapacity: parseInt(newEvent.menCapacity),
@@ -359,22 +393,80 @@ export default function EventsAdmin() {
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2 space-y-4 border-b pb-4">
+                  <Label>イベントスタンプ</Label>
+                  <RadioGroup
+                    value={newEvent.titlePrefix}
+                    onValueChange={(value) => {
+                      setNewEvent({ 
+                        ...newEvent, 
+                        titlePrefix: value,
+                        customPrefix: value === "custom" ? newEvent.customPrefix : ""
+                      });
+                    }}
+                    className="grid grid-cols-2 gap-4"
+                  >
+                    {TITLE_PREFIXES.map((prefix) => (
+                      <div key={prefix.id} className="flex items-center space-x-2">
+                        <RadioGroupItem value={prefix.id} id={prefix.id} />
+                        <Label htmlFor={prefix.id} className="cursor-pointer">
+                          {prefix.label}
+                        </Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                  
+                  {newEvent.titlePrefix === "custom" && (
+                    <div className="space-y-2">
+                      <Label htmlFor="customPrefix">イベントスタンプ自由記入（10-20文字）</Label>
+                      <Input
+                        id="customPrefix"
+                        value={newEvent.customPrefix}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value.length <= 20) {
+                            setNewEvent({ ...newEvent, customPrefix: value });
+                          }
+                        }}
+                        placeholder="イベントスタンプ内容を入力"
+                        className={newEvent.customPrefix.length < 10 ? "border-yellow-500" : ""}
+                      />
+                      <p className="text-sm text-gray-500">
+                        {newEvent.customPrefix.length}/20文字
+                        {newEvent.customPrefix.length < 10 && (
+                          <span className="text-yellow-500 ml-2">最低10文字必要です</span>
+                        )}
+                      </p>
+                    </div>
+                  )}
+                </div>
                 <div className="col-span-2 space-y-2">
                   <Label htmlFor="title">イベント名</Label>
-                  <Input
-                    id="title"
-                    value={newEvent.title}
-                    onChange={handleTitleChange}
-                    className={titleError ? "border-red-500" : ""}
-                    placeholder="最大100文字まで"
-                    required
-                  />
-                  {titleError && (
-                    <p className="text-sm text-red-500 mt-1">{titleError}</p>
-                  )}
-                  <p className="text-sm text-gray-500 mt-1">
-                    {newEvent.title.length}/100文字
-                  </p>
+                  <div className="space-y-2">
+                    {newEvent.titlePrefix && (
+                      <div className="text-sm text-gray-500">
+                        イベントスタンプ「
+                        {newEvent.titlePrefix === "custom" 
+                          ? newEvent.customPrefix 
+                          : TITLE_PREFIXES.find(p => p.id === newEvent.titlePrefix)?.label}
+                        」
+                      </div>
+                    )}
+                    <Input
+                      id="title"
+                      value={newEvent.title}
+                      onChange={handleTitleChange}
+                      className={titleError ? "border-red-500" : ""}
+                      placeholder="最大100文字まで"
+                      required
+                    />
+                    {titleError && (
+                      <p className="text-sm text-red-500 mt-1">{titleError}</p>
+                    )}
+                    <p className="text-sm text-gray-500 mt-1">
+                      {newEvent.title.length}/100文字
+                    </p>
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="type">イベント種別</Label>
@@ -595,6 +687,27 @@ export default function EventsAdmin() {
                   onChange={(e) => setNewEvent({ ...newEvent, requirements: e.target.value })}
                   placeholder="イベントの規約を入力してください"
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="remainingCount">
+                  {newEvent.titlePrefix === "menRemaining" && "残り募集人数（男性）"}
+                  {newEvent.titlePrefix === "womenRemaining" && "残り募集人数（女性）"}
+                  {newEvent.titlePrefix === "currentParticipants" && "現在の参加者数"}
+                </Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="remainingCount"
+                    type="number"
+                    value={newEvent.remainingCount}
+                    onChange={(e) => setNewEvent({ ...newEvent, remainingCount: e.target.value })}
+                    placeholder="例: 5"
+                    className="w-32"
+                    min="1"
+                    required
+                  />
+                  <span>名</span>
+                </div>
               </div>
 
               <div className="flex justify-end space-x-4">
