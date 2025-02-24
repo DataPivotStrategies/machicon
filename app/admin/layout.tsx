@@ -52,10 +52,10 @@ export default function AdminLayout({
             </h1>
           </div>
           <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-600 hidden sm:inline">管理者: Admin</span>
-            <Button variant="ghost" size="icon">
+            <span className="text-sm text-gray-600 hidden sm:inline">管理者Admin</span>
+            {/* <Button variant="ghost" size="icon">
               <LogOut className="h-5 w-5" />
-            </Button>
+            </Button> */}
           </div>
         </div>
       </header>
