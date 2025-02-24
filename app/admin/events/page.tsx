@@ -396,7 +396,9 @@ export default function EventsAdmin() {
                     onChange={(e) => setNewEvent({ ...newEvent, locationDetails: e.target.value })}
                   />
                 </div>
+              </div>
 
+              <div className="grid grid-cols-2 gap-4 mt-6">
                 <div className="space-y-2">
                   <Label htmlFor="menPrice">男性料金</Label>
                   <Input
