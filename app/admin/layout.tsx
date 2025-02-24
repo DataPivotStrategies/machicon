@@ -49,12 +49,12 @@ export default function AdminLayout({
             </Button>
             <h1 className="text-xl font-bold">街コンポータル 管理画面</h1>
           </div>
-          {/* <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4">
             <span className="text-sm text-gray-600 hidden sm:inline">管理者: Admin</span>
             <Button variant="ghost" size="icon">
               <LogOut className="h-5 w-5" />
             </Button>
-          </div> */}
+          </div>
         </div>
       </header>
 

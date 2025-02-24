@@ -31,14 +31,14 @@ export function Footer() {
               <li>お問い合わせ</li>
             </ul>
           </div>
-          <div>
+          {/* <div>
             <h3 className="font-semibold mb-3">フォローする</h3>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-600 hover:text-gray-900">Twitter</a>
               <a href="#" className="text-gray-600 hover:text-gray-900">Instagram</a>
               <a href="#" className="text-gray-600 hover:text-gray-900">Facebook</a>
             </div>
-          </div>
+          </div> */}
         </div>
         <div className="mt-8 pt-8 border-t text-center text-sm text-gray-600">
           <div className="flex items-center justify-center mb-2">
