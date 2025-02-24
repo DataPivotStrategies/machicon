@@ -379,7 +379,7 @@ export default function EventsAdmin() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="location">会場場所</Label>
+                  <Label htmlFor="location">会場名</Label>
                   <Input
                     id="location"
                     value={newEvent.location}
