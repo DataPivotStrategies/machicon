@@ -586,6 +586,17 @@ export default function EventsAdmin() {
                 ))}
               </div>
 
+              <div className="space-y-2">
+                <Label htmlFor="requirements">イベント規約</Label>
+                <textarea
+                  id="requirements"
+                  className="w-full min-h-[100px] p-2 border rounded-md"
+                  value={newEvent.requirements}
+                  onChange={(e) => setNewEvent({ ...newEvent, requirements: e.target.value })}
+                  placeholder="イベントの規約を入力してください"
+                />
+              </div>
+
               <div className="flex justify-end space-x-4">
                 <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
                   キャンセル
